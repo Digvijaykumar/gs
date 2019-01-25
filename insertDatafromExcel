@@ -1,0 +1,40 @@
+function getConnection1()
+{
+  return Jdbc.getConnection('jdbc:mysql://'+serverIP1+'/'+DATABASE1+'', username1, pasword1);
+}
+function paramSheet(){
+  
+  
+  
+  try{
+ var spreadsheetId = '';
+  var sheet= SpreadsheetApp.openById(spreadsheetId).getSheets()[0];  
+
+  var rst = sheet.activate().getSheetValues(2, 1,71, 10) //getSheetValues(startRow, startColumn, numRows, numColumns)
+  
+  //Logger.log(rst.length);
+   var sqlConnection = getConnection1(); 
+  var stmt = sqlConnection.createStatement();
+   if(rst.length > 1){
+    
+     for (var i = 0; i < rst.length;i++) {
+       var query = "INSERT INTO `tblName` "
+       + "(`fld1`,`fld2`,`Parameter_3`,`Parameter_4`,`Parameter_5`,`Parameter_6`,`Parameter_7`) "
+       + "VALUES ('"+rst[i][0]+"','"+rst[i][1]+"','"+rst[i][2]+"','"+rst[i][3]+"','"+rst[i][4]+"','"+rst[i][5]+"','"+rst[i][6]+"')"
+       Logger.log('Insert query => '+query);
+        stmt.executeUpdate(query);
+     }
+     
+   }
+  }catch(e){      Logger.log("eror"+(e))
+  Logger.log("eror"+(e.lineNumber))
+  
+  MailApp.sendEmail({
+    to: 'mailID',
+    subject: "Insert data from excel",
+    htmlBody: "\r\nMessage: " + e.message + "\r\nFile: " + e.fileName
+    + "\r\nLine: " + e.lineNumber,
+  });    
+          }
+  
+}
